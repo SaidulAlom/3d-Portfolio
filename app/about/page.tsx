@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { Calendar, MapPin, Award, Code, Server, Database, Users } from 'lucide-react';
 import AnimatedSection from '@/components/AnimatedSection';
 import Image from 'next/image';
-import MyImage from './IMG-20250406-WA0104.jpg';
 
 export default function About() {
   const timeline = [
@@ -116,7 +115,7 @@ export default function About() {
             >
               <div className="absolute inset-0 glow rounded-full overflow-hidden">
                 <Image
-                  src={MyImage}
+                  src="/images/saidul-alom.jpg"
                   alt="Saidul Alom"
                   fill
                   className="object-cover rounded-full"

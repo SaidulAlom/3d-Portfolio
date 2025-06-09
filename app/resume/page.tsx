@@ -178,8 +178,7 @@ export default function Resume() {
         <AnimatedSection delay={0.6}>
           <div className="mb-12">
             <h3 className="text-3xl font-bold mb-8 text-center flex items-center justify-center gap-2">
-              <Globe className="text-blue-4
-00" size={32} />
+              <Globe className="text-blue-400" size={32} />
               Languages
             </h3>
             <div className="grid md:grid-cols-4 gap-8">
@@ -323,7 +322,7 @@ export default function Resume() {
           transition={{ duration: 0.8, delay: 1.6 }}
           className="text-center"
         >
-          <a href="/Resume.pdf" download="Saidul_Alom_Resume.pdf">
+          <a href="/saidul-alom-resume.pdf" download="Saidul_Alom_Resume.pdf">
             <Button size="lg" className="glass-card hover:glow text-lg px-8 py-6">
               <Download className="mr-2" />
               Download Resume

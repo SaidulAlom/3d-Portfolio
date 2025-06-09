@@ -9,7 +9,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import AnimatedSection from '@/components/AnimatedSection';
 import Image from 'next/image';
-import MyImage from './IMG-20250406-WA0104.jpg';
 
 interface FormData {
   name: string;
@@ -214,7 +213,7 @@ export default function Contact() {
               >
                 <div className="absolute inset-0 glow rounded-full">
                   <Image
-                    src={MyImage}
+                    src="/images/saidul-alom.jpg"
                     alt="Saidul Alom"
                     fill
                     className="object-cover rounded-full"

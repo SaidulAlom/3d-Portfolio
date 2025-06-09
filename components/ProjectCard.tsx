@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ExternalLink, Github, Eye } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 interface Project {
   id: string;
@@ -31,9 +32,11 @@ export default function ProjectCard({ project, onViewDetails }: ProjectCardProps
     >
       <Card className="glass-card hover:glow-cyan transition-all duration-300 overflow-hidden h-full">
         <div className="relative overflow-hidden">
-          <img
+          <Image
             src={project.image}
             alt={project.title}
+            width={400}
+            height={200}
             className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

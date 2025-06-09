@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Component, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, Search, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import ProjectCard from '@/components/ProjectCard';
 import AnimatedSection from '@/components/AnimatedSection';
+import Image from 'next/image';
 
 interface Project {
   id: string;
@@ -56,6 +57,34 @@ const projects: Project[] = [
 
 const categories = ['All', 'Full Stack', 'GIS', 'HR Automation'];
 
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  state: ErrorBoundaryState = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || <h1>Something went wrong. Please try again later.</h1>;
+    }
+    return this.props.children;
+  }
+}
+
 export default function Projects() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [activeCategory, setActiveCategory] = useState('All');
@@ -70,153 +99,157 @@ export default function Projects() {
   });
 
   return (
-    <div className="min-h-screen pt-24 pb-16">
-      <div className="container mx-auto px-6">
-        {/* Header */}
-        <AnimatedSection className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 gradient-text text-glow">
-            My Projects
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            A showcase of my full-stack development projects, blending modern web technologies and innovative solutions
-          </p>
-        </AnimatedSection>
+    <ErrorBoundary fallback={<h1>Failed to load projects. Please try again later.</h1>}>
+      <div className="min-h-screen pt-24 pb-16">
+        <div className="container mx-auto px-6">
+          {/* Header */}
+          <AnimatedSection className="text-center mb-16">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 gradient-text text-glow">
+              My Projects
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              A showcase of my full-stack development projects, blending modern web technologies and innovative solutions
+            </p>
+          </AnimatedSection>
 
-        {/* Filters */}
-        <AnimatedSection delay={0.2}>
-          <div className="glass-card p-6 mb-12">
-            <div className="flex flex-col md:flex-row gap-6 items-center">
-              {/* Search */}
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
-                <Input
-                  placeholder="Search projects..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 glass-card"
-                />
-              </div>
+          {/* Filters */}
+          <AnimatedSection delay={0.2}>
+            <div className="glass-card p-6 mb-12">
+              <div className="flex flex-col md:flex-row gap-6 items-center">
+                {/* Search */}
+                <div className="relative flex-1 max-w-md">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
+                  <Input
+                    placeholder="Search projects..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 glass-card"
+                  />
+                </div>
 
-              {/* Category Filters */}
-              <div className="flex flex-wrap gap-2">
-                <Filter className="text-muted-foreground mr-2" size={20} />
-                {categories.map((category) => (
-                  <Button
-                    key={category}
-                    variant={activeCategory === category ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setActiveCategory(category)}
-                    className={`glass-card ${
-                      activeCategory === category ? 'bg-gradient-to-br from-blue-600 to-purple-600' : 'hover:glow-cyan'
-                    }`}
-                  >
-                    {category}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </AnimatedSection>
-
-        {/* Projects Grid */}
-        <motion.div
-          layout
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
-          <AnimatePresence>
-            {filteredProjects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <ProjectCard
-                  project={project}
-                  onViewDetails={() => setSelectedProject(project)}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
-
-        {/* No Results */}
-        {filteredProjects.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-16"
-          >
-            <h3 className="text-2xl font-bold mb-4">No projects found</h3>
-            <p className="text-muted-foreground">Try adjusting your search or filter criteria</p>
-          </motion.div>
-        )}
-      </div>
-
-      {/* Project Details Modal */}
-      <Dialog open={!!selectedProject} onOpenChange={() => setSelectedProject(null)}>
-        <DialogContent className="glass-card max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl">
-          {selectedProject && (
-            <div>
-              <DialogHeader>
-                <DialogTitle className="text-2xl gradient-text">
-                  {selectedProject.title}
-                </DialogTitle>
-              </DialogHeader>
-              
-              <div className="mt-6">
-                <img
-                  src={selectedProject.image}
-                  alt={selectedProject.title}
-                  className="w-full max-w-lg mx-auto h-auto object-cover rounded-lg mb-6"
-                />
-                
-                <div className="space-y-6">
-                  <p className="text-lg text-muted-foreground">
-                    {selectedProject.longDescription}
-                  </p>
-                  
-                  <div>
-                    <h4 className="text-lg font-semibold mb-3">Technologies Used</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProject.technologies.map((tech) => (
-                        <span
-                          key={tech}
-                          className="px-3 py-1 text-sm rounded-full bg-purple-500/20 text-purple-400 border border-gray-500/30"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-4">
-                    {selectedProject.liveUrl && (
-                      <Button
-                        onClick={() => window.open(selectedProject.liveUrl, '_blank')}
-                        className="glass-card hover:glow"
-                      >
-                        View Project
-                      </Button>
-                    )}
-                    {selectedProject.githubUrl && (
-                      <Button
-                        variant="outline"
-                        onClick={() => window.open(selectedProject.githubUrl, '_blank')}
-                        className="glass-card hover:glow-cyan"
-                      >
-                        View Code
-                      </Button>
-                    )}
-                  </div>
+                {/* Category Filters */}
+                <div className="flex flex-wrap gap-2">
+                  <Filter className="text-muted-foreground mr-2" size={20} />
+                  {categories.map((category) => (
+                    <Button
+                      key={category}
+                      variant={activeCategory === category ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setActiveCategory(category)}
+                      className={`glass-card ${
+                        activeCategory === category ? 'bg-gradient-to-br from-blue-600 to-purple-600' : 'hover:glow-cyan'
+                      }`}
+                    >
+                      {category}
+                    </Button>
+                  ))}
                 </div>
               </div>
             </div>
+          </AnimatedSection>
+
+          {/* Projects Grid */}
+          <motion.div
+            layout
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            <AnimatePresence>
+              {filteredProjects.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <ProjectCard
+                    project={project}
+                    onViewDetails={() => setSelectedProject(project)}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* No Results */}
+          {filteredProjects.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-16"
+            >
+              <h3 className="text-2xl font-bold mb-4">No projects found</h3>
+              <p className="text-muted-foreground">Try adjusting your search or filter criteria</p>
+            </motion.div>
           )}
-        </DialogContent>
-      </Dialog>
-    </div>
+        </div>
+
+        {/* Project Details Modal */}
+        <Dialog open={!!selectedProject} onOpenChange={() => setSelectedProject(null)}>
+          <DialogContent className="glass-card max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl">
+            {selectedProject && (
+              <div>
+                <DialogHeader>
+                  <DialogTitle className="text-2xl gradient-text">
+                    {selectedProject.title}
+                  </DialogTitle>
+                </DialogHeader>
+                
+                <div className="mt-6">
+                  <Image
+                    src={selectedProject.image}
+                    alt={selectedProject.title}
+                    width={800}
+                    height={400}
+                    className="w-full max-w-lg mx-auto h-auto object-cover rounded-lg mb-6"
+                  />
+                  
+                  <div className="space-y-6">
+                    <p className="text-lg text-muted-foreground">
+                      {selectedProject.longDescription}
+                    </p>
+                    
+                    <div>
+                      <h4 className="text-lg font-semibold mb-3">Technologies Used</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedProject.technologies.map((tech) => (
+                          <span
+                            key={tech}
+                            className="px-3 py-1 text-sm rounded-full bg-purple-500/20 text-purple-400 border border-gray-500/30"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-4">
+                      {selectedProject.liveUrl && (
+                        <Button
+                          onClick={() => window.open(selectedProject.liveUrl, '_blank')}
+                          className="glass-card hover:glow"
+                        >
+                          View Project
+                        </Button>
+                      )}
+                      {selectedProject.githubUrl && (
+                        <Button
+                          variant="outline"
+                          onClick={() => window.open(selectedProject.githubUrl, '_blank')}
+                          className="glass-card hover:glow-cyan"
+                        >
+                          View Code
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
+    </ErrorBoundary>
   );
 }
