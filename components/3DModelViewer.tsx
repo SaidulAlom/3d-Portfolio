@@ -38,9 +38,23 @@ function Scene() {
 }
 
 export default function Model3DViewer({ className = '', autoRotate = true }: Model3DViewerProps) {
+  const handleContextLost = (event: Event) => {
+    event.preventDefault();
+    console.warn('WebGL context lost. Attempting to restore...');
+  };
+
   return (
     <div className={`w-full h-full ${className}`}>
-      <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+      <Canvas 
+        camera={{ position: [0, 0, 5], fov: 45 }}
+        onContextLost={handleContextLost}
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: 'high-performance',
+          failIfMajorPerformanceCaveat: true,
+        }}
+      >
         <Suspense fallback={null}>
           <Scene />
           <OrbitControls

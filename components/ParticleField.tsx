@@ -41,9 +41,23 @@ function Particles() {
 }
 
 export default function ParticleField() {
+  const handleContextLost = (event: Event) => {
+    event.preventDefault();
+    console.warn('WebGL context lost in ParticleField. Attempting to restore...');
+  };
+
   return (
     <div className="fixed inset-0 -z-10">
-      <Canvas camera={{ position: [0, 0, 1] }}>
+      <Canvas 
+        camera={{ position: [0, 0, 1] }}
+        onContextLost={handleContextLost}
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: 'high-performance',
+          failIfMajorPerformanceCaveat: true,
+        }}
+      >
         <Particles />
       </Canvas>
     </div>

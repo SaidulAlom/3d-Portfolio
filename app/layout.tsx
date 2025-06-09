@@ -5,6 +5,7 @@ import { ThemeProvider } from 'next-themes';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PageTransition from '@/components/PageTransition';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,22 +25,24 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange={false}
-        >
-          <div className="relative min-h-screen overflow-x-hidden">
-            <Header />
-            <PageTransition>
-              <main className="relative z-10">
-                {children}
-              </main>
-            </PageTransition>
-            <Footer />
-          </div>
-        </ThemeProvider>
+        <ErrorBoundary>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange={false}
+          >
+            <div className="relative min-h-screen overflow-x-hidden">
+              <Header />
+              <PageTransition>
+                <main className="relative z-10">
+                  {children}
+                </main>
+              </PageTransition>
+              <Footer />
+            </div>
+          </ThemeProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );
