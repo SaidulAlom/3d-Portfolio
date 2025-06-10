@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useEffect, useRef } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, type CanvasProps } from '@react-three/fiber';
 import { OrbitControls, Sphere, MeshDistortMaterial, Float } from '@react-three/drei';
 import type { WebGLRendererParameters } from 'three';
 
@@ -56,18 +56,19 @@ export default function Model3DViewer({ className = '', autoRotate = true }: Mod
     };
   }, []);
 
+  const canvasProps: CanvasProps = {
+    camera: { position: [0, 0, 5], fov: 45 },
+    gl: {
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance',
+      failIfMajorPerformanceCaveat: true,
+    } as WebGLRendererParameters,
+  };
+
   return (
     <div className={`w-full h-full ${className}`}>
-      <Canvas 
-        ref={canvasRef}
-        camera={{ position: [0, 0, 5], fov: 45 }}
-        gl={{
-          antialias: true,
-          alpha: true,
-          powerPreference: 'high-performance',
-          failIfMajorPerformanceCaveat: true,
-        } as WebGLRendererParameters}
-      >
+      <Canvas ref={canvasRef} {...canvasProps}>
         <Suspense fallback={null}>
           <Scene />
           <OrbitControls

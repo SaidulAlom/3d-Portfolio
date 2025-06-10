@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useMemo, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, type CanvasProps } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import type { WebGLRendererParameters } from 'three';
@@ -59,18 +59,19 @@ export default function ParticleField() {
     };
   }, []);
 
+  const canvasProps: CanvasProps = {
+    camera: { position: [0, 0, 1] },
+    gl: {
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance',
+      failIfMajorPerformanceCaveat: true,
+    } as WebGLRendererParameters,
+  };
+
   return (
     <div className="fixed inset-0 -z-10">
-      <Canvas 
-        ref={canvasRef}
-        camera={{ position: [0, 0, 1] }}
-        gl={{
-          antialias: true,
-          alpha: true,
-          powerPreference: 'high-performance',
-          failIfMajorPerformanceCaveat: true,
-        } as WebGLRendererParameters}
-      >
+      <Canvas ref={canvasRef} {...canvasProps}>
         <Particles />
       </Canvas>
     </div>
