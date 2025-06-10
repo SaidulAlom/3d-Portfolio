@@ -1,8 +1,9 @@
 'use client';
 
 import { Suspense, useEffect, useRef } from 'react';
-import { Canvas, type ThreeElements } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Sphere, MeshDistortMaterial, Float } from '@react-three/drei';
+import type { WebGLRendererParameters } from 'three';
 
 interface Model3DViewerProps {
   className?: string;
@@ -65,7 +66,7 @@ export default function Model3DViewer({ className = '', autoRotate = true }: Mod
           alpha: true,
           powerPreference: 'high-performance',
           failIfMajorPerformanceCaveat: true,
-        } as ThreeElements['canvas']}
+        } as WebGLRendererParameters}
       >
         <Suspense fallback={null}>
           <Scene />

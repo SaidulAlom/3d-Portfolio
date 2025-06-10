@@ -1,9 +1,10 @@
 'use client';
 
 import { useRef, useMemo, useEffect } from 'react';
-import { Canvas, useFrame, type ThreeElements } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
+import type { WebGLRendererParameters } from 'three';
 
 function Particles() {
   const ref = useRef<THREE.Points>(null);
@@ -68,7 +69,7 @@ export default function ParticleField() {
           alpha: true,
           powerPreference: 'high-performance',
           failIfMajorPerformanceCaveat: true,
-        } as ThreeElements['canvas']}
+        } as WebGLRendererParameters}
       >
         <Particles />
       </Canvas>
