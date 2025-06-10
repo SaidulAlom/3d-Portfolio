@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Sphere, MeshDistortMaterial, Float } from '@react-three/drei';
 
@@ -38,16 +38,28 @@ function Scene() {
 }
 
 export default function Model3DViewer({ className = '', autoRotate = true }: Model3DViewerProps) {
-  const handleContextLost = (event: Event) => {
-    event.preventDefault();
-    console.warn('WebGL context lost. Attempting to restore...');
-  };
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleContextLost = (event: Event) => {
+      event.preventDefault();
+      console.warn('WebGL context lost. Attempting to restore...');
+    };
+
+    canvas.addEventListener('webglcontextlost', handleContextLost);
+    return () => {
+      canvas.removeEventListener('webglcontextlost', handleContextLost);
+    };
+  }, []);
 
   return (
     <div className={`w-full h-full ${className}`}>
       <Canvas 
+        ref={canvasRef}
         camera={{ position: [0, 0, 5], fov: 45 }}
-        onContextLost={handleContextLost}
         gl={{
           antialias: true,
           alpha: true,
