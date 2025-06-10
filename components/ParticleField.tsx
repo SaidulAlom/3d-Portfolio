@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo, useEffect, useState } from 'react';
 import { Canvas, useFrame, type CanvasProps } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
@@ -42,9 +42,11 @@ function Particles() {
 }
 
 export default function ParticleField() {
+  const [isMounted, setIsMounted] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    setIsMounted(true);
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -53,9 +55,16 @@ export default function ParticleField() {
       console.warn('WebGL context lost in ParticleField. Attempting to restore...');
     };
 
+    const handleContextRestored = () => {
+      console.log('WebGL context restored in ParticleField');
+    };
+
     canvas.addEventListener('webglcontextlost', handleContextLost);
+    canvas.addEventListener('webglcontextrestored', handleContextRestored);
+    
     return () => {
       canvas.removeEventListener('webglcontextlost', handleContextLost);
+      canvas.removeEventListener('webglcontextrestored', handleContextRestored);
     };
   }, []);
 
@@ -66,8 +75,13 @@ export default function ParticleField() {
       alpha: true,
       powerPreference: 'high-performance',
       failIfMajorPerformanceCaveat: true,
+      preserveDrawingBuffer: true,
     } as WebGLRendererParameters,
   };
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 -z-10">

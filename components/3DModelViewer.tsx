@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { Canvas, type CanvasProps } from '@react-three/fiber';
 import { OrbitControls, Sphere, MeshDistortMaterial, Float } from '@react-three/drei';
 import type { WebGLRendererParameters } from 'three';
@@ -39,9 +39,11 @@ function Scene() {
 }
 
 export default function Model3DViewer({ className = '', autoRotate = true }: Model3DViewerProps) {
+  const [isMounted, setIsMounted] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    setIsMounted(true);
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -50,9 +52,16 @@ export default function Model3DViewer({ className = '', autoRotate = true }: Mod
       console.warn('WebGL context lost. Attempting to restore...');
     };
 
+    const handleContextRestored = () => {
+      console.log('WebGL context restored');
+    };
+
     canvas.addEventListener('webglcontextlost', handleContextLost);
+    canvas.addEventListener('webglcontextrestored', handleContextRestored);
+    
     return () => {
       canvas.removeEventListener('webglcontextlost', handleContextLost);
+      canvas.removeEventListener('webglcontextrestored', handleContextRestored);
     };
   }, []);
 
@@ -63,8 +72,13 @@ export default function Model3DViewer({ className = '', autoRotate = true }: Mod
       alpha: true,
       powerPreference: 'high-performance',
       failIfMajorPerformanceCaveat: true,
+      preserveDrawingBuffer: true,
     } as WebGLRendererParameters,
   };
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <div className={`w-full h-full ${className}`}>
